@@ -13,6 +13,7 @@
 #include "tc_common_new/hardware.h"
 #include "tc_common_new/ip_util.h"
 #include "tc_common_new/base64.h"
+#include "tc_common_new/uuid.h"
 
 using namespace nlohmann;
 
@@ -40,12 +41,17 @@ namespace tc
                 mac_address = mac_address.append(item.mac_address_);
             }
             if (hardware_desc.empty()) {
-                return nullptr;
+                LOGW("Hardware desc is empty! Can't request new device!");
             }
             hw_info = hardware_desc + Base64::Base64Encode(mac_address);
         }
         else {
             hw_info = info;
+        }
+
+        // SHIT!
+        if (hw_info.empty()) {
+            hw_info = GetUUID();
         }
 
         auto client = HttpClient::Make(std::format("{}:{}", sdk_param_.host_, sdk_param_.port_), kApiRequestNewDevice);
@@ -58,7 +64,7 @@ namespace tc
             {"hw_info", hw_info},
         });
         if (resp.status != 200 || resp.body.empty()) {
-            LOGE("Request for steam games failed.");
+            LOGE("Request new device failed.");
             return nullptr;
         }
 
