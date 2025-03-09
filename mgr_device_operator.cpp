@@ -55,7 +55,7 @@ namespace tc
         }
 
         auto client = HttpClient::Make(std::format("{}:{}", sdk_param_.host_, sdk_param_.port_), kApiRequestNewDevice);
-        auto resp = client->Request({
+        auto resp = client->Post({
 #ifdef WIN32
             {"platform", "windows"},
 #else

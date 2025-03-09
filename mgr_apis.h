@@ -10,7 +10,7 @@
 namespace tc
 {
 
-    const std::string kApiRequestNewDevice = "/request/new/device";
+    const std::string kApiRequestNewDevice = "/create/new/device";
 
 }
 
