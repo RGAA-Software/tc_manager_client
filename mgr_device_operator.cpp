@@ -29,6 +29,11 @@ namespace tc
     }
 
     std::shared_ptr<MgrDevice> MgrDeviceOperator::RequestNewDevice(const std::string& info) {
+        if (sdk_param_.host_.empty()) {
+            LOGE("RequestNewDevice error, host is empty.");
+            return nullptr;
+        }
+
         std::string hw_info;
         if (info.empty()) {
             auto hardware_desc = Hardware::Instance()->GetHardwareDescription();
