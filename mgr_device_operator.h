@@ -21,6 +21,8 @@ namespace tc
         void SetSdkParam(const MgrClientSdkParam& param);
         // device
         std::shared_ptr<MgrDevice> RequestNewDevice(const std::string& info);
+        //
+        std::shared_ptr<MgrDevice> RefreshRandomPwd(const std::string& device_id);
 
     private:
         std::shared_ptr<MgrContext> mgr_context_ = nullptr;

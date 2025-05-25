@@ -88,4 +88,34 @@ namespace tc
         }
     }
 
+    std::shared_ptr<MgrDevice> MgrDeviceOperator::RefreshRandomPwd(const std::string& target_device_id) {
+        if (sdk_param_.host_.empty()) {
+            LOGE("RefreshRandomPwd error, host is empty.");
+            return nullptr;
+        }
+        auto client = HttpClient::Make(std::format("{}:{}", sdk_param_.host_, sdk_param_.port_), kApiRefreshRandomPwd);
+        auto resp = client->Post({
+                {"device_id", target_device_id},
+            });
+        if (resp.status != 200 || resp.body.empty()) {
+            LOGE("Request new device failed.");
+            return nullptr;
+        }
+
+        try {
+            LOGI("RefreshRandomPwd resp: {}", resp.body);
+            auto obj = json::parse(resp.body);
+            auto device_id = obj["data"]["device_id"].get<std::string>();
+            auto random_pwd = obj["data"]["random_pwd"].get<std::string>();
+            LOGI("RefreshRandomPwd: {} => {}", device_id, random_pwd);
+            auto device = std::make_shared<MgrDevice>();
+            device->device_id_ = device_id;
+            device->random_pwd_ = random_pwd;
+            return device;
+        } catch(std::exception& e) {
+            LOGE("RequestNewDevice failed: {}, message: {}", e.what(), resp.body);
+            return nullptr;
+        }
+    }
+
 }
