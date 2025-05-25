@@ -10,7 +10,10 @@
 namespace tc
 {
 
+    // create new device
     const std::string kApiRequestNewDevice = "/create/new/device";
+    // refresh random password
+    const std::string kApiRefreshRandomPwd = "/update/random/pwd";
 
 }
 
