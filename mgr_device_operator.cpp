@@ -59,7 +59,7 @@ namespace tc
             hw_info = GetUUID();
         }
 
-        auto client = HttpClient::Make(std::format("{}:{}", sdk_param_.host_, sdk_param_.port_), kApiRequestNewDevice);
+        auto client = HttpClient::Make(sdk_param_.host_, sdk_param_.port_, kApiRequestNewDevice);
         auto resp = client->Post({
 #ifdef WIN32
             {"platform", "windows"},
@@ -93,7 +93,7 @@ namespace tc
             LOGE("RefreshRandomPwd error, host is empty.");
             return nullptr;
         }
-        auto client = HttpClient::Make(std::format("{}:{}", sdk_param_.host_, sdk_param_.port_), kApiRefreshRandomPwd);
+        auto client = HttpClient::Make(sdk_param_.host_, sdk_param_.port_, kApiRefreshRandomPwd);
         auto resp = client->Post({
                 {"device_id", target_device_id},
             });
