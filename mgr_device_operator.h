@@ -19,10 +19,12 @@ namespace tc
     public:
         explicit MgrDeviceOperator(const std::shared_ptr<MgrContext>& ctx);
         void SetSdkParam(const MgrClientSdkParam& param);
-        // device
+        // create new device
         std::shared_ptr<MgrDevice> RequestNewDevice(const std::string& info);
-        //
-        std::shared_ptr<MgrDevice> RefreshRandomPwd(const std::string& device_id);
+        // update random password
+        std::shared_ptr<MgrDevice> UpdateRandomPwd(const std::string& device_id);
+        // update safety password
+        std::shared_ptr<MgrDevice> UpdateSafetyPwd(const std::string& device_id, const std::string& new_safety_pwd);
 
     private:
         std::shared_ptr<MgrContext> mgr_context_ = nullptr;
