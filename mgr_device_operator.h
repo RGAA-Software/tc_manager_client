@@ -25,6 +25,8 @@ namespace tc
         std::shared_ptr<MgrDevice> UpdateRandomPwd(const std::string& device_id);
         // update safety password
         std::shared_ptr<MgrDevice> UpdateSafetyPwd(const std::string& device_id, const std::string& new_safety_pwd);
+        // get device
+        std::shared_ptr<MgrDevice> GetDevice(const std::string& device_id);
 
     private:
         std::shared_ptr<MgrContext> mgr_context_ = nullptr;

@@ -35,4 +35,8 @@ namespace tc
         return device_opt_;
     }
 
+    bool MgrClientSdk::IsServerConfigured() const {
+        return !sdk_param_.host_.empty() && sdk_param_.port_ > 0;
+    }
+
 }

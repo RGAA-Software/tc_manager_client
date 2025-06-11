@@ -23,6 +23,7 @@ namespace tc
         void SetSdkParam(const MgrClientSdkParam& param);
 
         std::shared_ptr<MgrDeviceOperator> GetDeviceOperator();
+        [[nodiscard]] bool IsServerConfigured() const;
 
     private:
         std::shared_ptr<MgrContext> mgr_context_ = nullptr;

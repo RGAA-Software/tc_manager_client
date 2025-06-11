@@ -76,11 +76,11 @@ namespace tc
         try {
             auto obj = json::parse(resp.body);
             auto device_id = obj["data"]["device_id"].get<std::string>();
-            auto random_pwd = obj["data"]["random_pwd"].get<std::string>();
-            LOGI("RequestNewDevice: {} => {}", device_id, random_pwd);
+            auto random_pwd_md5 = obj["data"]["random_pwd_md5"].get<std::string>();
+            LOGI("RequestNewDevice: {} => RPWD: {}", device_id, random_pwd_md5);
             auto device = std::make_shared<MgrDevice>();
             device->device_id_ = device_id;
-            device->random_pwd_ = random_pwd;
+            device->random_pwd_md5_ = random_pwd_md5;
             return device;
         } catch(std::exception& e) {
             LOGE("RequestNewDevice failed: {}, message: {}", e.what(), resp.body);
@@ -106,11 +106,11 @@ namespace tc
             LOGI("UpdateRandomPwd resp: {}", resp.body);
             auto obj = json::parse(resp.body);
             auto device_id = obj["data"]["device_id"].get<std::string>();
-            auto random_pwd = obj["data"]["random_pwd"].get<std::string>();
-            LOGI("UpdateRandomPwd: {} => {}", device_id, random_pwd);
+            auto random_pwd_md5 = obj["data"]["random_pwd_md5"].get<std::string>();
+            LOGI("UpdateRandomPwd: {} => {}", device_id, random_pwd_md5);
             auto device = std::make_shared<MgrDevice>();
             device->device_id_ = device_id;
-            device->random_pwd_ = random_pwd;
+            device->random_pwd_md5_ = random_pwd_md5;
             return device;
         } catch(std::exception& e) {
             LOGE("UpdateRandomPwd failed: {}, message: {}", e.what(), resp.body);
@@ -137,17 +137,19 @@ namespace tc
             LOGI("UpdateSafetyPwd resp: {}", resp.body);
             auto obj = json::parse(resp.body);
             auto device_id = obj["data"]["device_id"].get<std::string>();
-            auto random_pwd = obj["data"]["random_pwd"].get<std::string>();
-            auto safety_pwd = obj["data"]["safety_pwd"].get<std::string>();
-            LOGI("UpdateSafetyPwd: {} => {}", device_id, random_pwd);
+            auto safety_pwd_md5 = obj["data"]["safety_pwd_md5"].get<std::string>();
+            LOGI("UpdateSafetyPwd: {} => {}", device_id, safety_pwd_md5);
             auto device = std::make_shared<MgrDevice>();
             device->device_id_ = device_id;
-            device->random_pwd_ = random_pwd;
-            device->safety_pwd_ = safety_pwd;
+            device->safety_pwd_md5_ = safety_pwd_md5;
             return device;
         } catch(std::exception& e) {
             LOGE("UpdateSafetyPwd failed: {}, message: {}", e.what(), resp.body);
             return nullptr;
         }
+    }
+
+    std::shared_ptr<MgrDevice> MgrDeviceOperator::GetDevice(const std::string& device_id) {
+        return nullptr;
     }
 }
