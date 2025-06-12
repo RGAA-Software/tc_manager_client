@@ -73,19 +73,7 @@ namespace tc
             return nullptr;
         }
 
-        try {
-            auto obj = json::parse(resp.body);
-            auto device_id = obj["data"]["device_id"].get<std::string>();
-            auto random_pwd_md5 = obj["data"]["random_pwd_md5"].get<std::string>();
-            LOGI("RequestNewDevice: {} => RPWD: {}", device_id, random_pwd_md5);
-            auto device = std::make_shared<MgrDevice>();
-            device->device_id_ = device_id;
-            device->random_pwd_md5_ = random_pwd_md5;
-            return device;
-        } catch(std::exception& e) {
-            LOGE("RequestNewDevice failed: {}, message: {}", e.what(), resp.body);
-            return nullptr;
-        }
+        return ParseJsonAsDevice(resp.body);
     }
 
     std::shared_ptr<MgrDevice> MgrDeviceOperator::UpdateRandomPwd(const std::string& target_device_id) {
@@ -102,23 +90,10 @@ namespace tc
             return nullptr;
         }
 
-        try {
-            LOGI("UpdateRandomPwd resp: {}", resp.body);
-            auto obj = json::parse(resp.body);
-            auto device_id = obj["data"]["device_id"].get<std::string>();
-            auto random_pwd_md5 = obj["data"]["random_pwd_md5"].get<std::string>();
-            LOGI("UpdateRandomPwd: {} => {}", device_id, random_pwd_md5);
-            auto device = std::make_shared<MgrDevice>();
-            device->device_id_ = device_id;
-            device->random_pwd_md5_ = random_pwd_md5;
-            return device;
-        } catch(std::exception& e) {
-            LOGE("UpdateRandomPwd failed: {}, message: {}", e.what(), resp.body);
-            return nullptr;
-        }
+        return ParseJsonAsDevice(resp.body);
     }
 
-    std::shared_ptr<MgrDevice> MgrDeviceOperator::UpdateSafetyPwd(const std::string& target_device_id, const std::string& new_safety_pwd) {
+    std::shared_ptr<MgrDevice> MgrDeviceOperator::UpdateSafetyPwd(const std::string& target_device_id, const std::string& safety_pwd_md5) {
         if (sdk_param_.host_.empty()) {
             LOGE("UpdateSafetyPwd error, host is empty.");
             return nullptr;
@@ -126,30 +101,57 @@ namespace tc
         auto client = HttpClient::Make(sdk_param_.host_, sdk_param_.port_, kApiUpdateSafetyPwd, 2000);
         auto resp = client->Post({
              {"device_id", target_device_id},
-             {"new_safety_pwd", new_safety_pwd},
+             {"safety_pwd_md5", safety_pwd_md5},
         });
         if (resp.status != 200 || resp.body.empty()) {
             LOGE("UpdateSafetyPwd failed.");
             return nullptr;
         }
 
-        try {
-            LOGI("UpdateSafetyPwd resp: {}", resp.body);
-            auto obj = json::parse(resp.body);
-            auto device_id = obj["data"]["device_id"].get<std::string>();
-            auto safety_pwd_md5 = obj["data"]["safety_pwd_md5"].get<std::string>();
-            LOGI("UpdateSafetyPwd: {} => {}", device_id, safety_pwd_md5);
-            auto device = std::make_shared<MgrDevice>();
-            device->device_id_ = device_id;
-            device->safety_pwd_md5_ = safety_pwd_md5;
-            return device;
-        } catch(std::exception& e) {
-            LOGE("UpdateSafetyPwd failed: {}, message: {}", e.what(), resp.body);
-            return nullptr;
-        }
+        return ParseJsonAsDevice(resp.body);
     }
 
-    std::shared_ptr<MgrDevice> MgrDeviceOperator::GetDevice(const std::string& device_id) {
-        return nullptr;
+    std::shared_ptr<MgrDevice> MgrDeviceOperator::QueryDevice(const std::string& device_id) {
+        if (sdk_param_.host_.empty()) {
+            LOGE("RequestNewDevice error, host is empty.");
+            return nullptr;
+        }
+        auto client = HttpClient::Make(sdk_param_.host_, sdk_param_.port_, kApiQueryDeviceById);
+        auto resp = client->Request({
+            {"device_id", device_id},
+        });
+        if (resp.status != 200 || resp.body.empty()) {
+            LOGE("GetDevice failed: {}", device_id);
+            return nullptr;
+        }
+
+        return ParseJsonAsDevice(resp.body);
+    }
+
+    std::shared_ptr<MgrDevice> MgrDeviceOperator::ParseJsonAsDevice(const std::string& body) {
+        try {
+            auto obj = json::parse(body);
+            auto resp_device_id = obj["data"]["device_id"].get<std::string>();
+            auto random_pwd_md5 = obj["data"]["random_pwd_md5"].get<std::string>();
+            auto gen_random_pwd = obj["data"]["gen_random_pwd"].get<std::string>();
+            auto safety_pwd_md5 = obj["data"]["safety_pwd_md5"].get<std::string>();
+            auto used_time = obj["data"]["used_time"].get<int64_t>();
+            auto created_timestamp = obj["data"]["created_timestamp"].get<int64_t>();
+            auto last_update_timestamp = obj["data"]["last_update_timestamp"].get<int64_t>();
+            LOGI("PaserJsonAsDevice: {} => RPWD: {}, SPWD: {}", resp_device_id, random_pwd_md5, safety_pwd_md5);
+
+            auto device = std::make_shared<MgrDevice>();
+            device->device_id_ = resp_device_id;
+            device->gen_random_pwd_ = gen_random_pwd;
+            device->random_pwd_md5_ = random_pwd_md5;
+            device->safety_pwd_md5_ = safety_pwd_md5;
+            device->used_time_ = used_time;
+            device->created_timestamp_ = created_timestamp;
+            device->updated_timestamp_ = last_update_timestamp;
+            return device;
+        } catch(std::exception& e) {
+            LOGE("RequestNewDevice failed: {}, message: {}", e.what(), body);
+            return nullptr;
+        }
     }
 }
