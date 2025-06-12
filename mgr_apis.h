@@ -16,6 +16,8 @@ namespace tc
     const std::string kApiUpdateRandomPwd = "/update/random/pwd";
     // update safety password
     const std::string kApiUpdateSafetyPwd = "/update/safety/pwd";
+    // get device by id
+    const std::string kApiQueryDeviceById = "/query/device/by/id";
 
 }
 
