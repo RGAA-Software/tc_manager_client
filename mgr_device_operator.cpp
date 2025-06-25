@@ -48,7 +48,7 @@ namespace tc
             if (hardware_desc.empty()) {
                 LOGW("Hardware desc is empty! Can't request new device!");
             }
-            hw_info = hardware_desc + Base64::Base64Encode(mac_address);
+            hw_info = Base64::Base64Encode(hardware_desc + mac_address);
         }
         else {
             hw_info = info;
@@ -68,6 +68,8 @@ namespace tc
 #endif
             {"hw_info", hw_info},
         });
+
+        // wireshark: http and ip.addr == 39.91.109.105 and tcp.port == 40301
         if (resp.status != 200 || resp.body.empty()) {
             LOGE("Request new device failed.");
             return nullptr;
