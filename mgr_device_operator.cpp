@@ -140,7 +140,7 @@ namespace tc
             auto used_time = obj["data"]["used_time"].get<int64_t>();
             auto created_timestamp = obj["data"]["created_timestamp"].get<int64_t>();
             auto last_update_timestamp = obj["data"]["last_update_timestamp"].get<int64_t>();
-            LOGI("PaserJsonAsDevice: {} => RPWD: {}, SPWD: {}", resp_device_id, random_pwd_md5, safety_pwd_md5);
+            //LOGI("PaserJsonAsDevice: {} => RPWD: {}, SPWD: {}", resp_device_id, random_pwd_md5, safety_pwd_md5);
 
             auto device = std::make_shared<MgrDevice>();
             device->device_id_ = resp_device_id;
