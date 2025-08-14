@@ -59,7 +59,7 @@ namespace tc
             hw_info = GetUUID();
         }
 
-        auto client = HttpClient::Make(sdk_param_.host_, sdk_param_.port_, kApiRequestNewDevice);
+        auto client = HttpClient::MakeSSL(sdk_param_.host_, sdk_param_.port_, kApiRequestNewDevice);
         auto resp = client->Post({
 #ifdef WIN32
             {"platform", "windows"},
@@ -83,7 +83,7 @@ namespace tc
             LOGE("UpdateRandomPwd error, host is empty.");
             return nullptr;
         }
-        auto client = HttpClient::Make(sdk_param_.host_, sdk_param_.port_, kApiUpdateRandomPwd);
+        auto client = HttpClient::MakeSSL(sdk_param_.host_, sdk_param_.port_, kApiUpdateRandomPwd);
         auto resp = client->Post({
                 {"device_id", target_device_id},
             });
@@ -100,7 +100,7 @@ namespace tc
             LOGE("UpdateSafetyPwd error, host is empty.");
             return nullptr;
         }
-        auto client = HttpClient::Make(sdk_param_.host_, sdk_param_.port_, kApiUpdateSafetyPwd, 2000);
+        auto client = HttpClient::MakeSSL(sdk_param_.host_, sdk_param_.port_, kApiUpdateSafetyPwd, 2000);
         auto resp = client->Post({
              {"device_id", target_device_id},
              {"safety_pwd_md5", safety_pwd_md5},
@@ -118,7 +118,7 @@ namespace tc
             LOGE("RequestNewDevice error, host is empty.");
             return nullptr;
         }
-        auto client = HttpClient::Make(sdk_param_.host_, sdk_param_.port_, kApiQueryDeviceById);
+        auto client = HttpClient::MakeSSL(sdk_param_.host_, sdk_param_.port_, kApiQueryDeviceById);
         auto resp = client->Request({
             {"device_id", device_id},
         });
