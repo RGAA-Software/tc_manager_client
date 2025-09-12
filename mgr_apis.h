@@ -10,14 +10,20 @@
 namespace tc
 {
 
+    // /api/v1/device/control
+    const std::string kSpvrDeviceControl = "/api/v1/device/control";
+
     // create new device
-    const std::string kApiRequestNewDevice = "/create/new/device";
+    const std::string kApiRequestNewDevice = kSpvrDeviceControl + "/create/new/device";
+
     // update random password
-    const std::string kApiUpdateRandomPwd = "/update/random/pwd";
+    const std::string kApiUpdateRandomPwd = kSpvrDeviceControl + "/update/random/pwd";
+
     // update safety password
-    const std::string kApiUpdateSafetyPwd = "/update/safety/pwd";
+    const std::string kApiUpdateSafetyPwd = kSpvrDeviceControl + "/update/safety/pwd";
+
     // get device by id
-    const std::string kApiQueryDeviceById = "/query/device/by/id";
+    const std::string kApiQueryDeviceById = kSpvrDeviceControl + "/query/device/by/id";
 
 }
 

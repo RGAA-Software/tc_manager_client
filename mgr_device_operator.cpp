@@ -67,11 +67,12 @@ namespace tc
             {"platform", "android"},
 #endif
             {"hw_info", hw_info},
+            {"appkey", sdk_param_.appkey_}
         });
 
         // wireshark: http and ip.addr == 39.91.109.105 and tcp.port == 40301
         if (resp.status != 200 || resp.body.empty()) {
-            LOGE("Request new device failed.");
+            LOGE("Request new device failed, code: {}", resp.status);
             return nullptr;
         }
 
@@ -86,6 +87,7 @@ namespace tc
         auto client = HttpClient::MakeSSL(sdk_param_.host_, sdk_param_.port_, kApiUpdateRandomPwd);
         auto resp = client->Post({
                 {"device_id", target_device_id},
+                {"appkey", sdk_param_.appkey_}
             });
         if (resp.status != 200 || resp.body.empty()) {
             LOGE("UpdateRandomPwd failed.");
@@ -104,6 +106,7 @@ namespace tc
         auto resp = client->Post({
              {"device_id", target_device_id},
              {"safety_pwd_md5", safety_pwd_md5},
+             {"appkey", sdk_param_.appkey_}
         });
         if (resp.status != 200 || resp.body.empty()) {
             LOGE("UpdateSafetyPwd failed.");
@@ -121,6 +124,7 @@ namespace tc
         auto client = HttpClient::MakeSSL(sdk_param_.host_, sdk_param_.port_, kApiQueryDeviceById);
         auto resp = client->Request({
             {"device_id", device_id},
+            {"appkey", sdk_param_.appkey_}
         });
         if (resp.status != 200 || resp.body.empty()) {
             LOGE("GetDevice failed: {}", device_id);

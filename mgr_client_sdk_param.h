@@ -15,6 +15,7 @@ namespace tc
         std::string host_;
         int port_{0};
         bool ssl_ = false;
+        std::string appkey_;
     };
 
 
