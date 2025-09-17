@@ -70,12 +70,15 @@ namespace tc
             {"appkey", sdk_param_.appkey_}
         });
 
+        LOGI("RequestNewDevice, hw_info: {}, appkey: {}", hw_info, sdk_param_.appkey_);
+
         // wireshark: http and ip.addr == 39.91.109.105 and tcp.port == 40301
         if (resp.status != 200 || resp.body.empty()) {
             LOGE("Request new device failed, code: {}", resp.status);
             return nullptr;
         }
 
+        LOGI("NewDeviceResp: {}", resp.body);
         return ParseJsonAsDevice(resp.body);
     }
 
@@ -94,6 +97,7 @@ namespace tc
             return nullptr;
         }
 
+        LOGI("UpdateRandomPwd: {}", resp.body);
         return ParseJsonAsDevice(resp.body);
     }
 
