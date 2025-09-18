@@ -7,7 +7,9 @@
 
 #include <memory>
 #include <string>
+#include "mgr_errors.h"
 #include "mgr_client_sdk_param.h"
+#include "tc_3rdparty/expt/expected.h"
 
 namespace tc
 {
@@ -20,13 +22,13 @@ namespace tc
         explicit MgrDeviceOperator(const std::shared_ptr<MgrContext>& ctx);
         void SetSdkParam(const MgrClientSdkParam& param);
         // create new device
-        std::shared_ptr<MgrDevice> RequestNewDevice(const std::string& info);
+        Result<std::shared_ptr<MgrDevice>, MgrError> RequestNewDevice(const std::string& info);
         // update random password
-        std::shared_ptr<MgrDevice> UpdateRandomPwd(const std::string& device_id);
+        Result<std::shared_ptr<MgrDevice>, MgrError> UpdateRandomPwd(const std::string& device_id);
         // update safety password
-        std::shared_ptr<MgrDevice> UpdateSafetyPwd(const std::string& device_id, const std::string& safety_pwd_md5);
+        Result<std::shared_ptr<MgrDevice>, MgrError> UpdateSafetyPwd(const std::string& device_id, const std::string& safety_pwd_md5);
         // get device
-        std::shared_ptr<MgrDevice> QueryDevice(const std::string& device_id);
+        Result<std::shared_ptr<MgrDevice>, MgrError> QueryDevice(const std::string& device_id);
 
     private:
         static std::shared_ptr<MgrDevice> ParseJsonAsDevice(const std::string& body);

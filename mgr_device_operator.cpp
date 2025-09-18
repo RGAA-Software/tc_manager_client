@@ -28,10 +28,10 @@ namespace tc
         sdk_param_ = param;
     }
 
-    std::shared_ptr<MgrDevice> MgrDeviceOperator::RequestNewDevice(const std::string& info) {
+    Result<std::shared_ptr<MgrDevice>, MgrError> MgrDeviceOperator::RequestNewDevice(const std::string& info) {
         if (sdk_param_.host_.empty()) {
             LOGE("RequestNewDevice error, host is empty.");
-            return nullptr;
+            return TcErr(MgrError::kInvalidHostAddress);
         }
 
         std::string hw_info;
@@ -71,40 +71,49 @@ namespace tc
         });
 
         LOGI("RequestNewDevice, hw_info: {}, appkey: {}", hw_info, sdk_param_.appkey_);
-
-        // wireshark: http and ip.addr == 39.91.109.105 and tcp.port == 40301
+        LOGI("NewDeviceResp, status: {}, body: {}", resp.status, resp.body);
         if (resp.status != 200 || resp.body.empty()) {
             LOGE("Request new device failed, code: {}", resp.status);
-            return nullptr;
+            return TcErr((MgrError)resp.status);
         }
 
-        LOGI("NewDeviceResp: {}", resp.body);
-        return ParseJsonAsDevice(resp.body);
+        if (auto r = ParseJsonAsDevice(resp.body); r) {
+            return r;
+        }
+        else {
+            return TcErr(MgrError::kParseJsonFailed);
+        }
     }
 
-    std::shared_ptr<MgrDevice> MgrDeviceOperator::UpdateRandomPwd(const std::string& target_device_id) {
+    Result<std::shared_ptr<MgrDevice>, MgrError> MgrDeviceOperator::UpdateRandomPwd(const std::string& target_device_id) {
         if (sdk_param_.host_.empty()) {
             LOGE("UpdateRandomPwd error, host is empty.");
-            return nullptr;
+            return TcErr(MgrError::kInvalidHostAddress);
         }
         auto client = HttpClient::MakeSSL(sdk_param_.host_, sdk_param_.port_, kApiUpdateRandomPwd);
         auto resp = client->Post({
-                {"device_id", target_device_id},
-                {"appkey", sdk_param_.appkey_}
-            });
+            {"device_id", target_device_id},
+            {"appkey", sdk_param_.appkey_}
+        });
+
+        LOGI("UpdateRandomPwd, status:{}, : {}", resp.status, resp.body);
         if (resp.status != 200 || resp.body.empty()) {
-            LOGE("UpdateRandomPwd failed.");
-            return nullptr;
+            LOGE("UpdateRandomPwd failed: {}", resp.status);
+            return TcErr((MgrError)resp.status);
         }
 
-        LOGI("UpdateRandomPwd: {}", resp.body);
-        return ParseJsonAsDevice(resp.body);
+        if (auto r = ParseJsonAsDevice(resp.body); r) {
+            return r;
+        }
+        else {
+            return TcErr(MgrError::kParseJsonFailed);
+        }
     }
 
-    std::shared_ptr<MgrDevice> MgrDeviceOperator::UpdateSafetyPwd(const std::string& target_device_id, const std::string& safety_pwd_md5) {
+    Result<std::shared_ptr<MgrDevice>, MgrError> MgrDeviceOperator::UpdateSafetyPwd(const std::string& target_device_id, const std::string& safety_pwd_md5) {
         if (sdk_param_.host_.empty()) {
             LOGE("UpdateSafetyPwd error, host is empty.");
-            return nullptr;
+            return TcErr(MgrError::kInvalidHostAddress);
         }
         auto client = HttpClient::MakeSSL(sdk_param_.host_, sdk_param_.port_, kApiUpdateSafetyPwd, 2000);
         auto resp = client->Post({
@@ -112,30 +121,45 @@ namespace tc
              {"safety_pwd_md5", safety_pwd_md5},
              {"appkey", sdk_param_.appkey_}
         });
+
+        LOGI("UpdateSafetyPwd, status: {}, : {}", resp.status, resp.body);
         if (resp.status != 200 || resp.body.empty()) {
-            LOGE("UpdateSafetyPwd failed.");
-            return nullptr;
+            LOGE("UpdateSafetyPwd failed: {}", resp.status);
+            return TcErr((MgrError)resp.status);
         }
 
-        return ParseJsonAsDevice(resp.body);
+        if (auto r = ParseJsonAsDevice(resp.body); r) {
+            return r;
+        }
+        else {
+            return TcErr(MgrError::kParseJsonFailed);
+        }
     }
 
-    std::shared_ptr<MgrDevice> MgrDeviceOperator::QueryDevice(const std::string& device_id) {
+    Result<std::shared_ptr<MgrDevice>, MgrError> MgrDeviceOperator::QueryDevice(const std::string& device_id) {
         if (sdk_param_.host_.empty()) {
             LOGE("RequestNewDevice error, host is empty.");
-            return nullptr;
+            return TcErr(MgrError::kInvalidHostAddress);
         }
         auto client = HttpClient::MakeSSL(sdk_param_.host_, sdk_param_.port_, kApiQueryDeviceById);
         auto resp = client->Request({
             {"device_id", device_id},
             {"appkey", sdk_param_.appkey_}
         });
+
+        LOGI("Req path: {}", client->GetReqPath());
+        LOGI("QueryDevice, status: {}, : {}", resp.status, resp.body);
         if (resp.status != 200 || resp.body.empty()) {
-            LOGE("GetDevice failed: {}", device_id);
-            return nullptr;
+            LOGE("GetDevice failed: {}, code: {}", device_id, resp.status);
+            return TcErr((MgrError)resp.status);
         }
 
-        return ParseJsonAsDevice(resp.body);
+        if (auto r = ParseJsonAsDevice(resp.body); r) {
+            return r;
+        }
+        else {
+            return TcErr(MgrError::kParseJsonFailed);
+        }
     }
 
     std::shared_ptr<MgrDevice> MgrDeviceOperator::ParseJsonAsDevice(const std::string& body) {
@@ -160,7 +184,7 @@ namespace tc
             device->updated_timestamp_ = last_update_timestamp;
             return device;
         } catch(std::exception& e) {
-            LOGE("RequestNewDevice failed: {}, message: {}", e.what(), body);
+            LOGE("ParseJsonAsDevice failed: {}, message: {}", e.what(), body);
             return nullptr;
         }
     }
