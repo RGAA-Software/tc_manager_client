@@ -147,8 +147,8 @@ namespace tc
             {"appkey", sdk_param_.appkey_}
         });
 
-        LOGI("Req path: {}", client->GetReqPath());
-        LOGI("QueryDevice, status: {}, : {}", resp.status, resp.body);
+        //LOGI("Req path: {}", client->GetReqPath());
+        //LOGI("QueryDevice, status: {}, : {}", resp.status, resp.body);
         if (resp.status != 200 || resp.body.empty()) {
             LOGE("GetDevice failed: {}, code: {}", device_id, resp.status);
             return TcErr((MgrError)resp.status);
